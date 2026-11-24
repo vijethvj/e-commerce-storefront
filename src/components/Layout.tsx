@@ -5,11 +5,15 @@ export default function Layout() {
     <>
       <header>
         <nav>
-          <Link to="/">Store</Link> | <Link to="/cart">Cart</Link>
+          <div className="container">
+            <Link to="/">Store</Link> | <Link to="/cart">Cart</Link>
+          </div>
         </nav>
       </header>
       <main>
-        <Outlet />
+        <div className="container">
+          <Outlet />
+        </div>
       </main>
     </>
   );

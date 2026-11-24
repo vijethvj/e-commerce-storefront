@@ -1,6 +1,12 @@
-import { useEffect, useState } from "react";
-import type { Product } from "../types/product";
-import { fetchProducts } from "../api/products";
+import { useEffect, useState } from 'react';
+import type { Product } from '../types/product';
+import { fetchProducts } from '../api/products';
+
+import ProductCard from '../components/ProductCard';
+
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
+
+const SKELETON_COUNT = 8;
 
 type Status = 'loading' | 'success' | 'error';
 
@@ -15,7 +21,6 @@ export default function ProductListPage() {
 
     fetchProducts(controller.signal)
       .then((data) => {
-        console.log(data.products);
         setProducts(data.products);
         setStatus('success');
       })
@@ -25,8 +30,8 @@ export default function ProductListPage() {
         setStatus('error');
       });
 
-      //Cleanup: cancel the request if the component unmounts
-      return () => controller.abort();
+    //Cleanup: cancel the request if the component unmounts
+    return () => controller.abort();
   }, [reloadKey]);
 
   function handleRetry() {
@@ -36,7 +41,18 @@ export default function ProductListPage() {
   }
 
   if (status === 'loading') {
-    return <p role="status">Loading Products...</p>;
+    return (
+      <div role="status">
+        <span className="visually-hidden">Loading products…</span>
+        <ul className="product-grid" aria-hidden="true">
+          {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+            <li key={i}>
+              <ProductCardSkeleton />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   }
 
   if (status === 'error') {
@@ -49,16 +65,15 @@ export default function ProductListPage() {
   }
 
   if (products.length === 0) {
-    return <p>No Products Found.</p>
+    return <p>No Products Found.</p>;
   }
-
 
   return (
     <>
-      <ul>
+      <ul className="product-grid">
         {products.map((p) => (
           <li key={p.id}>
-            {p.title} - ${p.price}
+            <ProductCard product={p} />
           </li>
         ))}
       </ul>
